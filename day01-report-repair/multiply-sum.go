@@ -14,15 +14,15 @@ func main() {
 
     for scanner.Scan() {
         numberText := scanner.Text()
-	number, _ := strconv.ParseInt(numberText, 10, 0)
-	numbers = append(numbers, number)
+    number, _ := strconv.ParseInt(numberText, 10, 0)
+    numbers = append(numbers, number)
     }
 
     for i, number1 := range numbers {
         for j, number2 := range numbers {
-	    if i < j && number1 + number2 == 2020 {
+        if i < j && number1 + number2 == 2020 {
                 fmt.Println(number1 * number2)
-	    }
-	}
+        }
+    }
     }
 }

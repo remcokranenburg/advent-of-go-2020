@@ -14,7 +14,7 @@ func validatePassword(min, max int64, letter rune, password string) bool {
     for _, x := range(password) {
         if x == letter {
             numLetters += 1
-	}
+        }
     }
 
     return min <= numLetters && max >= numLetters
@@ -27,17 +27,17 @@ func main() {
 
     for scanner.Scan() {
         line := scanner.Text()
-	matches := pattern.FindStringSubmatch(line)
-	var minText = matches[1]
-	var maxText = matches[2]
-	var letter = []rune(matches[3])[0]
-	var password = matches[4]
-	min, _ := strconv.ParseInt(minText, 10, 0)
-	max, _ := strconv.ParseInt(maxText, 10, 0)
+        matches := pattern.FindStringSubmatch(line)
+        var minText = matches[1]
+        var maxText = matches[2]
+        var letter = []rune(matches[3])[0]
+        var password = matches[4]
+        min, _ := strconv.ParseInt(minText, 10, 0)
+        max, _ := strconv.ParseInt(maxText, 10, 0)
 
-	if validatePassword(min, max, letter, password) {
+        if validatePassword(min, max, letter, password) {
             numValidPasswords += 1
-	}
+        }
     }
 
     fmt.Println(numValidPasswords)
