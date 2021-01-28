@@ -22,7 +22,7 @@ func scanNumbers(scanner *bufio.Scanner) []int64 {
     return numbers
 }
 
-func buildIndices(numIndices int) []int {
+func buildRange(numIndices int) []int {
     var indices []int
 
     for i := 0; i < numIndices; i++ {
@@ -86,7 +86,7 @@ func main() {
     scanner := bufio.NewScanner(os.Stdin)
     numbers := scanNumbers(scanner)
 
-    indices := buildIndices(len(numbers))
+    indices := buildRange(len(numbers))
 
     groupsOfTwo := buildGroups(indices, 2)
     sumsOfTwo := findSums(numbers, groupsOfTwo, 2020)
