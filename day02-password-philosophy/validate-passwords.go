@@ -9,9 +9,9 @@ import (
 )
 
 func validatePassword(min, max int64, letter rune, password string) bool {
-    var numLetters int64 = 0
+    numLetters := int64(0)
 
-    for _, x := range(password) {
+    for _, x := range password {
         if x == letter {
             numLetters += 1
         }
@@ -21,9 +21,9 @@ func validatePassword(min, max int64, letter rune, password string) bool {
 }
 
 func main() {
-    var numValidPasswords int = 0
-    var scanner = bufio.NewScanner(os.Stdin)
-    var pattern = regexp.MustCompile(`([0-9]+)-([0-9]+) ([a-zA-Z0-9]): ([a-zA-Z0-9]+)`)
+    numValidPasswords := 0
+    scanner := bufio.NewScanner(os.Stdin)
+    pattern := regexp.MustCompile(`([0-9]+)-([0-9]+) ([a-zA-Z0-9]): ([a-zA-Z0-9]+)`)
 
     for scanner.Scan() {
         line := scanner.Text()
