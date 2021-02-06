@@ -22,7 +22,7 @@ func main() {
             field = append(field, []bool{})
         } else if value == '#' {
             row := len(field) - 1
-            field[row] = append(field[row],true)
+            field[row] = append(field[row], true)
         } else if value == '.' {
             row := len(field) - 1
             field[row] = append(field[row], false)
