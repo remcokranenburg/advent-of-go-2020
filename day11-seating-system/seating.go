@@ -34,13 +34,36 @@ func clamp(seats [][]rune, row, seat int) rune {
     return seats[row][seat]
 }
 
-func numNeighbors(seats [][]rune, row, seat int) int {
+func findInDirection(seats [][]rune, row, seat, down, right int) rune {
+
+    for i, j := row + down, seat + right; i >= 0 && i < len(seats) && j >= 0 && j < len(seats[i]); i, j = i + down, j + right {
+        s := seats[i][j]
+
+        if s != '.' {
+            return s
+        }
+    }
+
+    return 'X'
+}
+
+func numNeighbors(seats [][]rune, row, seat int, lineOfSight bool) int {
     result := 0
 
-    for i := row - 1; i <= row + 1; i++ {
-        for j := seat - 1; j <= seat + 1; j++ {
-            if !(i == row && j == seat) && clamp(seats, i, j) == '#' {
-                result++
+    if lineOfSight {
+        for i := -1; i <= 1; i++ {
+            for j := -1; j <= 1; j++ {
+                if !(i == j && j == 0 ) && findInDirection(seats, row, seat, i, j) == '#' {
+                    result++
+                }
+            }
+        }
+    } else {
+        for i := row - 1; i <= row + 1; i++ {
+            for j := seat - 1; j <= seat + 1; j++ {
+                if !(i == row && j == seat) && clamp(seats, i, j) == '#' {
+                    result++
+                }
             }
         }
     }
@@ -62,7 +85,8 @@ func numSeated(seats [][]rune) int {
     return result
 }
 
-func predictSeating(seats [][]rune) [][]rune {
+func predictSeating(seats [][]rune, maxNeighbors int,
+        lineOfSight bool) [][]rune {
     newSeats := [][]rune{}
 
     for i, row := range seats {
@@ -71,9 +95,9 @@ func predictSeating(seats [][]rune) [][]rune {
         for j, seat := range row {
             newSeat := 'X'
 
-            if seat == 'L' && numNeighbors(seats, i, j) == 0 {
+            if seat == 'L' && numNeighbors(seats, i, j, lineOfSight) == 0 {
                 newSeat = '#'
-            } else if seat == '#' && numNeighbors(seats, i, j) >= 4 {
+            } else if seat == '#' && numNeighbors(seats, i, j, lineOfSight) > maxNeighbors {
                 newSeat = 'L'
             } else {
                 newSeat = seat
@@ -101,7 +125,7 @@ func printSeats(seats [][]rune) {
 func printNeighbors(seats [][]rune) {
     for i, row := range seats {
         for j, _ := range row {
-            fmt.Printf("%d", numNeighbors(seats, i, j))
+            fmt.Printf("%d", numNeighbors(seats, i, j, false))
         }
 
         fmt.Println()
@@ -143,19 +167,31 @@ func main() {
         seats = append(seats, row)
     }
 
+    seatsLineOfSight := seats
+
     printSeats(seats)
     printNeighbors(seats)
     fmt.Println()
 
     previousSeats := [][]rune{}
+    previousSeatsLineOfSight := [][]rune{}
 
     for i := 0; !seatingIsEqual(previousSeats, seats); i++ {
         previousSeats = seats
-        seats = predictSeating(seats)
+        seats = predictSeating(seats, 3, false)
         printSeats(seats)
         printNeighbors(seats)
         fmt.Println()
     }
 
+    for i := 0; !seatingIsEqual(previousSeatsLineOfSight, seatsLineOfSight); i++ {
+        previousSeatsLineOfSight = seatsLineOfSight
+        seatsLineOfSight = predictSeating(seats, 4, true)
+        printSeats(seatsLineOfSight)
+        printNeighbors(seatsLineOfSight)
+        fmt.Println()
+    }
+
     fmt.Println(numSeated(seats))
+    fmt.Println(numSeated(seatsLineOfSight))
 }
