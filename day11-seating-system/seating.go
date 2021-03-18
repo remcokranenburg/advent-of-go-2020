@@ -122,10 +122,10 @@ func printSeats(seats [][]rune) {
     }
 }
 
-func printNeighbors(seats [][]rune) {
+func printNeighbors(seats [][]rune, lineOfSight bool) {
     for i, row := range seats {
         for j, _ := range row {
-            fmt.Printf("%d", numNeighbors(seats, i, j, false))
+            fmt.Printf("%d", numNeighbors(seats, i, j, lineOfSight))
         }
 
         fmt.Println()
@@ -153,6 +153,7 @@ func seatingIsEqual(a, b [][]rune) bool {
 }
 
 func main() {
+    verbose := len(os.Args) == 2 && os.Args[1] == "--verbose"
     scanner := bufio.NewScanner(os.Stdin)
     seats := [][]rune{}
 
@@ -169,9 +170,13 @@ func main() {
 
     seatsLineOfSight := seats
 
-    printSeats(seats)
-    printNeighbors(seats)
-    fmt.Println()
+    if verbose {
+        fmt.Println("Predict seating:")
+        fmt.Println()
+        printSeats(seats)
+        printNeighbors(seats, false)
+        fmt.Println()
+    }
 
     previousSeats := [][]rune{}
     previousSeatsLineOfSight := [][]rune{}
@@ -179,19 +184,34 @@ func main() {
     for i := 0; !seatingIsEqual(previousSeats, seats); i++ {
         previousSeats = seats
         seats = predictSeating(seats, 3, false)
-        printSeats(seats)
-        printNeighbors(seats)
+
+        if verbose {
+            printSeats(seats)
+            printNeighbors(seats, false)
+            fmt.Println()
+        }
+    }
+
+    if verbose {
+        fmt.Println("Predict seating (line of sight):")
+        fmt.Println()
+        printSeats(seatsLineOfSight)
+        printNeighbors(seatsLineOfSight, false)
         fmt.Println()
     }
 
     for i := 0; !seatingIsEqual(previousSeatsLineOfSight, seatsLineOfSight); i++ {
         previousSeatsLineOfSight = seatsLineOfSight
-        seatsLineOfSight = predictSeating(seats, 4, true)
-        printSeats(seatsLineOfSight)
-        printNeighbors(seatsLineOfSight)
-        fmt.Println()
+        seatsLineOfSight = predictSeating(seatsLineOfSight, 4, true)
+
+        if verbose {
+            printSeats(seatsLineOfSight)
+            printNeighbors(seatsLineOfSight, true)
+            fmt.Println()
+        }
     }
 
-    fmt.Println(numSeated(seats))
-    fmt.Println(numSeated(seatsLineOfSight))
+    fmt.Println("Number of occupied seats:", numSeated(seats))
+    fmt.Println("Number of occupied seats (line of sight):",
+            numSeated(seatsLineOfSight))
 }
