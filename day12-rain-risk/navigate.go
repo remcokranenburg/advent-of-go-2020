@@ -37,13 +37,39 @@ func abs(x int64) int64 {
     return x
 }
 
+func rotateLeft(north, east int64, rotations int) (int64, int64) {
+    for i := 0; i < rotations; i++ {
+        tmpEast := -north
+        north = east
+        east = tmpEast
+    }
+
+    return north, east
+}
+
+func rotateRight(north, east int64, rotations int) (int64, int64) {
+    for i := 0; i < rotations; i++ {
+        tmpEast := north
+        north = -east
+        east = tmpEast
+    }
+
+    return north, east
+}
+
 func main() {
     verbose := len(os.Args) == 2 && os.Args[1] == "--verbose"
     scanner := bufio.NewScanner(os.Stdin)
     pattern := regexp.MustCompile(`^([A-Z])(\d+)$`)
+
     direction := EAST
     positionNorth := int64(0)
     positionEast := int64(0)
+
+    waypointNorth := int64(1)
+    waypointEast := int64(10)
+    waypointShipNorth := int64(0)
+    waypointShipEast := int64(0)
 
     for scanner.Scan() {
         line := scanner.Text()
@@ -63,14 +89,42 @@ func main() {
             direction = mod(direction - value, int64(360))
         } else if action == "R" {
             direction = mod(direction + value, int64(360))
+        } else {
+            panic("Unexpected action (direction)")
         }
 
         if verbose {
-            fmt.Println("direction:", direction)
-            fmt.Println("position north:", positionNorth)
-            fmt.Println("position east:", positionEast)
+            fmt.Println("direction:", direction, "position:", positionNorth,
+                    "N", positionEast, "E")
+        }
+
+        if action == "N" {
+            waypointNorth += value
+        } else if action == "S" {
+            waypointNorth -= value
+        } else if action == "E" {
+            waypointEast += value
+        } else if action == "W" {
+            waypointEast -= value
+        } else if action == "L" {
+            waypointNorth, waypointEast = rotateLeft(waypointNorth,
+                    waypointEast, int(value) / 90)
+        } else if action == "R" {
+            waypointNorth, waypointEast = rotateRight(waypointNorth,
+                    waypointEast, int(value) / 90)
+        } else if action == "F" {
+            waypointShipNorth += waypointNorth * value
+            waypointShipEast += waypointEast * value
+        } else {
+            panic("Unexpected action (waypoint)")
+        }
+
+        if verbose {
+            fmt.Println("waypoint:", waypointNorth, "N", waypointEast, "E",
+                    "position:", waypointShipNorth, "N", waypointShipEast, "E")
         }
     }
 
     fmt.Println(abs(positionNorth) + abs(positionEast))
+    fmt.Println(abs(waypointShipNorth) + abs(waypointShipEast))
 }
