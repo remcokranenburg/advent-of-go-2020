@@ -9,8 +9,18 @@ import (
     "os"
 )
 
-// Insight: The interval is at least the product of all primes
-// Note: the offset might have effect
+func findEarliestDeparture(start, globalInterval, offset, busInterval int64) int64 {
+    cursor := start
+
+    for {
+        if ((cursor + offset) % busInterval) == 0 {
+            fmt.Println("global", globalInterval, "cursor", cursor, "offset", offset, "busInterval", busInterval)
+            return cursor
+        } else {
+            cursor += globalInterval
+        }
+    }
+}
 
 func findNextDeparture(desiredDeparture, busInterval int64) int64 {
     if desiredDeparture % busInterval == 0 {
@@ -86,37 +96,18 @@ func main() {
 
     fmt.Println(earliestBus * (earliestBusDeparture - desiredDeparture))
 
-    t := int64(0)
+    globalInterval := busIds[0]
+    result := int64(0)
 
-    for {
-        departures := []int64 {}
-
-        firstDeparture := findNextDeparture(t, busIds[0])
-
-        for i, busId := range busIds {
-            departures = append(departures,
-                    findNextDeparture(firstDeparture + desiredDiffs[i], busId))
+    for i, busId := range busIds {
+        if i == 0 {
+            continue
         }
 
-        if validateDepartures(departures, desiredDiffs) {
-            fmt.Println(firstDeparture)
-            break
-        } else {
-            fmt.Println("t:", t)
-            fmt.Println("firstDeparture:", firstDeparture)
-            fmt.Println("departures:", departures)
-            fmt.Println("desiredDiffs:", desiredDiffs)
-            fmt.Println("validateDepartures:", validateDepartures(departures, desiredDiffs))
-            newT := max(departures) - desiredDiffs[len(desiredDiffs) - 1]
-            if newT > t {
-                t = newT
-            } else {
-                t += 1
-            }
-        }
-
-        // if t > 3417 {
-        //     break
-        // }
+        result = findEarliestDeparture(
+                result, globalInterval, desiredDiffs[i], busId)
+        globalInterval = globalInterval * busId
     }
+
+    fmt.Println(result)
 }
